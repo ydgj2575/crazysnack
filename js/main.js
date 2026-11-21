@@ -434,11 +434,11 @@
       sfx.lose();
     }
     if (els.resultEyebrow) els.resultEyebrow.textContent = won ? "胜 利" : "失 败";
-    if (els.resultTitle) els.resultTitle.textContent = won ? "全部蛇只剩蛇头！" : "被蛇群撞倒了";
+    if (els.resultTitle) els.resultTitle.textContent = won ? "你好厉害哦~" : "原来你这么菜啊";
     if (els.resultDesc) {
       els.resultDesc.textContent = won
-        ? "场上每条蛇都被你撞成只剩一个蛇头，你赢了！"
-        : "生命值归零。撞断蛇身、躲开蛇头，再来一次吧。";
+        ? "场上已经全是蛇辣！"
+        : "菜就多练";
       if (els.resultDesc.classList) els.resultDesc.classList.toggle("lose", !won);
     }
     if (els.resultStats) {
