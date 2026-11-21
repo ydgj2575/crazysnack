@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1b2430" />
+  <meta name="description" content="躲避蛇：一个纯文字即时制网页小游戏。按住方向键自由移动，躲开不断追击的蛇头，撞断蛇身把蛇群全部切成只剩蛇头的长度 1 即可胜利。" />
+  <title>躲避蛇 · 文字小游戏</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="title-wrap">
+      <h1>躲 避 蛇</h1>
+      <p class="subtitle">纯文字即时制小游戏 · 按住方向键自由移动 · 撞断蛇身 · 三档难度（简单 15×15 / 普通 20×20 / 困难 30×30）</p>
+    </div>
+    <div class="hud">
+      <span class="chip mode" id="mode">选择难度中</span>
+      <span class="chip hp" id="hp">生命 ♥♥♥♥♥</span>
+      <span class="chip" id="snakes">蛇 —</span>
+      <span class="chip" id="steps">步数 0</span>
+      <span class="chip ghost" id="best">最佳 —</span>
+      <span class="chip ghost">即时制</span>
+      <button class="btn small" id="change-diff" type="button">换难度</button>
+      <button class="btn small" id="rules-toggle" type="button">规则</button>
+      <button class="btn small" id="restart" type="button">重开</button>
+    </div>
+  </header>
+
+  <section class="stage" id="stage">
+    <canvas id="game" aria-label="躲避蛇游戏画面"></canvas>
+    <p class="banner" id="banner">先在弹窗里选一个难度开始游戏</p>
+
+    <!-- 触屏方向键 -->
+    <div class="dpad" aria-label="方向键">
+      <button class="dbtn up" data-dir="up" type="button" aria-label="上">▲</button>
+      <button class="dbtn left" data-dir="left" type="button" aria-label="左">◀</button>
+      <button class="dbtn down" data-dir="down" type="button" aria-label="下">▼</button>
+      <button class="dbtn right" data-dir="right" type="button" aria-label="右">▶</button>
+    </div>
+
+    <!-- 规则面板（内容由 js/main.js 生成） -->
+    <aside class="rules hidden" id="rules" aria-label="规则说明"></aside>
+
+    <!-- 难度选择弹窗：游戏开始时必须选择 -->
+    <div class="overlay" id="start-overlay">
+      <div class="card start-card">
+        <p class="eyebrow">选 择 难 度</p>
+        <h2>躲避蛇</h2>
+        <p class="card-lead">
+          你在地图中央，四周是墙。<b>按住方向键 / 手机方向键就持续移动</b>，蛇和蛇头也会<b>自由行动</b>、一直朝你游过来。<br />
+          被蛇头碰到<b>扣 1 点生命</b>（共 5 点，撞后有短暂无敌）。撞向蛇的<b>身体</b>可以把它撞断：
+          被撞的那一节<b>不会消失</b>，而是变成一条独立的蛇；前后两截也各自独立（一条蛇只有一个蛇头），
+          你则被挡住（身后有空地会被弹开一格）。<br />
+          被蛇头围住时，可以扣 1 点生命把<b>只剩蛇头</b>的小蛇撞开一格自救。<br />
+          <b>把场上所有蛇都撞成只剩一个蛇头（长度 1），你就赢了。</b>
+        </p>
+        <div class="diff-list">
+          <button class="diff-card easy" id="diff-easy" type="button">
+            <span class="diff-key">1</span>
+            <span class="diff-name">简单模式</span>
+            <span class="diff-desc">15×15 地图 · 1 条长 10 的蛇</span>
+            <span class="diff-tip">适合先熟悉「撞断蛇身」的手感</span>
+          </button>
+          <button class="diff-card normal" id="diff-normal" type="button">
+            <span class="diff-key">2</span>
+            <span class="diff-name">普通模式</span>
+            <span class="diff-desc">20×20 地图 · 2 条长 10 的蛇</span>
+            <span class="diff-tip">两条蛇会同时朝你游过来</span>
+          </button>
+          <button class="diff-card hard" id="diff-hard" type="button">
+            <span class="diff-key">3</span>
+            <span class="diff-name">困难模式</span>
+            <span class="diff-desc">30×30 地图 · 3 条长 10 的蛇</span>
+            <span class="diff-tip">三条蛇三面夹击，切开后蛇头会更多</span>
+          </button>
+        </div>
+        <p class="card-note">操作：按住 WASD / 方向键 / 手机方向键持续移动 · 画布上滑动走一步 · R 重开 · N 换难度</p>
+        <button class="btn small ghost hidden" id="modal-continue" type="button">继续当前难度</button>
+      </div>
+    </div>
+
+    <!-- 结算弹窗 -->
+    <div class="overlay hidden" id="result-overlay">
+      <div class="card">
+        <p class="eyebrow" id="result-eyebrow">胜 利</p>
+        <h2 id="result-title">全部蛇只剩蛇头！</h2>
+        <p class="win-desc" id="result-desc"></p>
+        <p class="win-steps" id="result-stats"></p>
+        <div class="result-actions">
+          <button class="btn primary" id="result-again" type="button">再来一局</button>
+          <button class="btn" id="result-change" type="button">换难度</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>按住 WASD / 方向键自由移动</span>
+    <span>画布上滑动走一步 · R 重开 · N 换难度</span>
+    <span>目标：把所有蛇撞成只剩蛇头（长度 1）</span>
+  </footer>
+</main>
+<script src="./js/engine.js"></script>
+<script src="./js/art.js"></script>
+<script src="./js/main.js"></script>
+</body>
+</html>
